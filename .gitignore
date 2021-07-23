@@ -1,9 +1,6 @@
 *.class
 *.log
 .idea
-/project/*
-/target/
+/out
 .bsp
 *.iml
-
-build.sbt
