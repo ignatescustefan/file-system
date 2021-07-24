@@ -8,6 +8,25 @@ trait Command {
 }
 
 object Command {
-  def from(input: String): Command =
-    new UnknownCommand
+  val MKDIR = "mkdir"
+
+  def incompleteCommand(name: String): Command = new Command {
+    def apply(state: State): State = {
+      state.setMessage(name + " incomplete command")
+    }
+  }
+
+  def emptyCommand: Command = new Command {
+    def apply(state: State): State = state
+  }
+
+  def from(input: String): Command = {
+    val token: Array[String] = input.split(" ")
+    if (input.isEmpty || token.isEmpty) emptyCommand
+    else if (MKDIR.equals(token(0))) {
+      if (token.length < 2) incompleteCommand(MKDIR)
+      else new Mkdir(token(1))
+    }
+    else new UnknownCommand
+  }
 }
