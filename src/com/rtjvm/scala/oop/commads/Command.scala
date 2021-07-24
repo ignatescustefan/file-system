@@ -10,16 +10,8 @@ trait Command {
 object Command {
   val MKDIR = "mkdir"
   val LS = "ls"
-
-  def incompleteCommand(name: String): Command = new Command {
-    def apply(state: State): State = {
-      state.setMessage(name + " incomplete command")
-    }
-  }
-
-  def emptyCommand: Command = new Command {
-    def apply(state: State): State = state
-  }
+  val PWD = "pwd"
+  val TOUCH = "touch"
 
   def from(input: String): Command = {
     val token: Array[String] = input.split(" ")
@@ -30,7 +22,21 @@ object Command {
       else new Mkdir(token(1))
     } else if (LS.equals(token(0))) {
       new Ls
+    } else if (PWD.equals(token(0))) {
+      new Pwd
+    } else if (TOUCH.equals(token(0))) {
+      if (token.length < 2) incompleteCommand(MKDIR)
+      else new Touch(token(1))
+    } else new UnknownCommand
+  }
+
+  def incompleteCommand(name: String): Command = new Command {
+    def apply(state: State): State = {
+      state.setMessage(name + " incomplete command")
     }
-    else new UnknownCommand
+  }
+
+  def emptyCommand: Command = new Command {
+    def apply(state: State): State = state
   }
 }
