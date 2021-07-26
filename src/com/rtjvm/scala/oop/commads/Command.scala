@@ -12,6 +12,7 @@ object Command {
   val LS = "ls"
   val PWD = "pwd"
   val TOUCH = "touch"
+  val CD = "cd"
 
   def from(input: String): Command = {
     val token: Array[String] = input.split(" ")
@@ -27,7 +28,11 @@ object Command {
     } else if (TOUCH.equals(token(0))) {
       if (token.length < 2) incompleteCommand(MKDIR)
       else new Touch(token(1))
-    } else new UnknownCommand
+    } else if (CD.equals(token(0))) {
+      if (token.length < 2) incompleteCommand(CD)
+      else new Cd(token(1))
+    }
+    else new UnknownCommand
   }
 
   def incompleteCommand(name: String): Command = new Command {
