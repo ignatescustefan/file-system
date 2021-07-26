@@ -14,6 +14,7 @@ object Command {
   val TOUCH = "touch"
   val CD = "cd"
   val RM = "rm"
+  val ECHO = "echo"
 
   def from(input: String): Command = {
     val token: Array[String] = input.split(" ")
@@ -35,6 +36,9 @@ object Command {
     } else if (RM.equals(token(0))) {
       if (token.length < 2) incompleteCommand(RM)
       else new Rm(token(1))
+    } else if (ECHO.equals(token(0))) {
+      if (token.length < 2) incompleteCommand(ECHO)
+      else new Echo(token.tail.toList)
     }
     else new UnknownCommand
   }
