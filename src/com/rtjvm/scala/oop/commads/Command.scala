@@ -2,9 +2,8 @@ package com.rtjvm.scala.oop.commads
 
 import com.rtjvm.scala.oop.filesystem.State
 
-trait Command {
-  //transform the state in a new state
-  def apply(state: State): State
+trait Command extends (State => State) {
+
 }
 
 object Command {
@@ -15,41 +14,43 @@ object Command {
   val CD = "cd"
   val RM = "rm"
   val ECHO = "echo"
+  val CAT = "cat"
 
   def from(input: String): Command = {
     val token: Array[String] = input.split(" ")
 
     if (input.isEmpty || token.isEmpty) emptyCommand
-    else if (MKDIR.equals(token(0))) {
-      if (token.length < 2) incompleteCommand(MKDIR)
-      else new Mkdir(token(1))
-    } else if (LS.equals(token(0))) {
-      new Ls
-    } else if (PWD.equals(token(0))) {
-      new Pwd
-    } else if (TOUCH.equals(token(0))) {
-      if (token.length < 2) incompleteCommand(MKDIR)
-      else new Touch(token(1))
-    } else if (CD.equals(token(0))) {
-      if (token.length < 2) incompleteCommand(CD)
-      else new Cd(token(1))
-    } else if (RM.equals(token(0))) {
-      if (token.length < 2) incompleteCommand(RM)
-      else new Rm(token(1))
-    } else if (ECHO.equals(token(0))) {
-      if (token.length < 2) incompleteCommand(ECHO)
-      else new Echo(token.tail.toList)
+    else token(0) match {
+      case MKDIR =>
+        if (token.length < 2) incompleteCommand(MKDIR)
+        else new Mkdir(token(1))
+      case LS =>
+        new Ls
+      case PWD =>
+        new Pwd
+      case TOUCH =>
+        if (token.length < 2) incompleteCommand(MKDIR)
+        else new Touch(token(1))
+      case CD =>
+        if (token.length < 2) incompleteCommand(CD)
+        else new Cd(token(1))
+      case RM =>
+        if (token.length < 2) incompleteCommand(RM)
+        else new Rm(token(1))
+      case ECHO =>
+        if (token.length < 2) incompleteCommand(ECHO)
+        else new Echo(token.tail.toList)
+      case CAT =>
+        if (token.length < 2) incompleteCommand(CAT)
+        else new Cat(token(1))
+      case _ =>
+        new UnknownCommand
     }
-    else new UnknownCommand
   }
 
-  def incompleteCommand(name: String): Command = new Command {
-    def apply(state: State): State = {
-      state.setMessage(name + " incomplete command")
-    }
+  def incompleteCommand(name: String): Command = (state: State) => {
+    state.setMessage(name + " incomplete command")
   }
 
-  def emptyCommand: Command = new Command {
-    def apply(state: State): State = state
-  }
+  def emptyCommand: Command = (state: State) => state
 }
